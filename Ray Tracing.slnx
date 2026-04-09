@@ -3,5 +3,5 @@
     <Platform Name="x64" />
     <Platform Name="x86" />
   </Configurations>
-  <Project Path="Software Ray Tracer/Software Ray Tracer.vcxproj" />
+  <Project Path="Software Ray Tracer/Software Ray Tracer.vcxproj" Id="bcfbf415-ef49-4dd3-9a83-369d87337497" />
 </Solution>
