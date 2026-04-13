@@ -40,5 +40,8 @@
     <ClInclude Include="hittable_list.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="rtweekend_commons.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

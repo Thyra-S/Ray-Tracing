@@ -6,11 +6,11 @@
 class sphere : public hittable
 {
 public:															// Ensure that the radius is non-negative.
-	sphere(const point3& center, float radius) : center(center), radius(std::fmax(0,radius)) {}
+	sphere(const point3& center, float radius) : center(center), radius(std::fmaxf(0.0f, radius)) {}
 
 	bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override
 	{
-		auto oc = center - r.origin();
+		auto oc = r.origin() - center;
 		auto a = glm::dot(r.direction(), r.direction());
 		auto h = glm::dot(r.direction(), oc);
 		auto c = glm::dot(oc, oc) - radius * radius;
@@ -34,7 +34,7 @@ public:															// Ensure that the radius is non-negative.
 		rec.p = r.at(rec.t);
 		glm::vec3 outward_normal = (rec.p - center) / radius;
 		rec.set_face_normal(r, outward_normal);
-		x`	
+		
 		return true;
 	}
 private:

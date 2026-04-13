@@ -1,29 +1,13 @@
-#include <iostream>
-#include <glm/glm.hpp>
-#include "ray.h"
-#include "color.h"
+#include "rtweekend_commons.h"
 
-float hit_sphere(const point3& center, float radius, const ray& r)
-{
-	auto oc = center - r.origin();
-	auto a = glm::dot(r.direction(), r.direction());
-	auto h = glm::dot(r.direction(), oc);
-	auto c = glm::dot(oc, oc) - radius * radius;
-	auto discriminant = h * h - a * c;
-	
-	if (discriminant < 0)
-		return -1;
-	else
-		return (-h - sqrt(discriminant)) /a; // Return the nearest root that lies in the acceptable range.
-}
+#include "hittable.h"
+#include "hittable_list.h"
+#include "sphere.h"
 
-color ray_color(const ray& r)
-{
-	auto t = hit_sphere(point3(0, 0, -1), 0.5, r);
-	if (t > 0.0)
-	{
-		auto N = glm::normalize(r.at(t) - point3(0, 0, -1));
-		return 0.5f * color(N.x + 1, N.y + 1, N.z + 1);
+color ray_color(const ray& r, const hittable& world) {
+	hit_record rec;
+	if (world.hit(r, 0, infinity, rec)) {
+		return 0.5f * (rec.normal + color(1, 1, 1));
 	}
 		
 
@@ -40,6 +24,11 @@ int main()
 	// Calculate the image height, and ensure that it's at least 1.
 	int image_height = int(image_width / aspect_ratio);
 	image_height = (image_height < 1) ? 1 : image_height;
+
+	// World
+	hittable_list world;
+	world.add(make_shared<sphere>(point3(0, 0, -1), 0.5));
+	world.add(make_shared<sphere>(point3(0, -100.5, -1), 100));	
 
 	// Camera
 	auto focal_length = 1.0; // The distance from the camera center to the projection plane.
@@ -74,7 +63,7 @@ int main()
 			auto ray_direction = pixel_center - camera_center;
 			ray r(camera_center, ray_direction);
 
-			color pixel_color = ray_color(r);
+			color pixel_color = ray_color(r, world);
 			write_color(std::cout, pixel_color);
 		}
 	}

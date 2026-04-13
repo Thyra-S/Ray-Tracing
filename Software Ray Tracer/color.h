@@ -1,9 +1,7 @@
 #ifndef COLOR_H
 #define COLOR_H
 
-#include "glm/glm.hpp"
-
-#include <iostream>
+#include <glm.hpp>
 
 using color = glm::vec3;
 
