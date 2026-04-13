@@ -12,6 +12,7 @@
 using std::make_shared;
 using std::shared_ptr;
 
+
 // Constants
 
 const float infinity = std::numeric_limits<float>::infinity();
@@ -29,5 +30,8 @@ inline float degrees_to_radians(float degrees) {
 #include "interval.h"
 #include "ray.h"
 #include <glm/glm.hpp>
+
+using color = glm::vec3;
+using POINT = glm::vec3;
 
 #endif
