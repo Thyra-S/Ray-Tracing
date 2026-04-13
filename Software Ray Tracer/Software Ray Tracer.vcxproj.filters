@@ -43,5 +43,8 @@
     <ClInclude Include="rtweekend_commons.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="interval.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

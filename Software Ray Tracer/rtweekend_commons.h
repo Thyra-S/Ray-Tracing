@@ -26,6 +26,7 @@ inline float degrees_to_radians(float degrees) {
 // Common Headers
 
 #include "color.h"
+#include "interval.h"
 #include "ray.h"
 #include <glm/glm.hpp>
 

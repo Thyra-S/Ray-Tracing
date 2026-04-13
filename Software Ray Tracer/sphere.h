@@ -8,7 +8,7 @@ class sphere : public hittable
 public:															// Ensure that the radius is non-negative.
 	sphere(const point3& center, float radius) : center(center), radius(std::fmaxf(0.0f, radius)) {}
 
-	bool hit(const ray& r, float t_min, float t_max, hit_record& rec) const override
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
 		auto oc = r.origin() - center;
 		auto a = glm::dot(r.direction(), r.direction());
@@ -23,10 +23,10 @@ public:															// Ensure that the radius is non-negative.
 
 		// Find the nearest root that lies in the acceptable range.
 		auto root = (-h - sqrt_discriminant) / a;
-		if (root < t_min || root > t_max)
+		if (!ray_t.surrounds(root))
 		{
 			root = (-h + sqrt_discriminant) / a; // Try the other root.
-			if (root < t_min || root > t_max)
+			if (!ray_t.surrounds(root))
 				return false; // No roots are in the acceptable range.
 		}
 
