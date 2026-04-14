@@ -16,6 +16,11 @@ public:
 	int    max_depth = 10;   // Maximum number of ray bounces into scene
 	int thread_count = 24;
 
+	float vfov = 90;
+	point3 lookfrom = point3(0, 0, 0);   // Point camera is looking from
+	point3 lookat = point3(0, 0, -1);  // Point camera is looking at
+	glm::vec3   vup = glm::vec3(0,1,0);     // Camera-relative "up" direction
+
 	void render(const hittable& world) {
 		initialize();
 
@@ -41,23 +46,6 @@ public:
 		std::clog << "\rDone.                 \n";
 	}
 
-	void render_lines( const hittable& world)
-	{
-		int current_line;
-		while ((current_line = next_scanline++)<image_height) {
-			std::clog << "\rScanlines remaining: " << image_height-current_line << ' ' << std::flush;
-
-			for (int i = 0; i < image_width; i++) {
-				color pixel_color(0, 0, 0);
-				for (int sample = 0; sample < samples_per_pixel; sample++) {
-					ray r = get_ray(i, current_line);
-					pixel_color += ray_color(r, max_depth, world);
-				}
-				pixel_colors[(current_line * image_width) + i] = pixel_color;
-			}
-		}
-	}
-
 private:
 	/* Private Camera Variables Here */
 	int    image_height;   // Rendered image height
@@ -66,6 +54,7 @@ private:
 	point3 pixel00_loc;    // Location of pixel 0, 0
 	glm::vec3   pixel_delta_u;  // Offset to pixel to the right
 	glm::vec3   pixel_delta_v;  // Offset to pixel below
+	glm::vec3   u, v, w;              // Camera frame basis vectors
 
 	atomic<int> next_scanline;
 	vector<color> pixel_colors;
@@ -78,25 +67,49 @@ private:
 
 		pixel_samples_scale = 1.0f / samples_per_pixel;
 
-		center = point3(0, 0, 0);
+		center = lookfrom;
 
 		// Determine viewport dimensions.
-		auto focal_length = 1.0;
-		auto viewport_height = 2.0;
+		auto focal_length = glm::length(lookfrom - lookat);
+		auto theta = degrees_to_radians(vfov);
+		auto h = std::tan(theta / 2);
+		auto viewport_height = 2 * h * focal_length;
 		auto viewport_width = viewport_height * (float(image_width) / image_height);
 
+		// Calculate the u,v,w unit basis vectors for the camera coordinate frame.
+		w = glm::normalize(lookfrom - lookat);
+		u = glm::normalize(cross(vup, w));
+		v = cross(w, u);
+
 		// Calculate the vectors across the horizontal and down the vertical viewport edges.
-		auto viewport_u = glm::vec3(viewport_width, 0, 0);
-		auto viewport_v = glm::vec3(0, -viewport_height, 0);
+		glm::vec3 viewport_u = viewport_width * u;    // Vector across viewport horizontal edge
+		glm::vec3 viewport_v = viewport_height * -v;  // Vector down viewport vertical edge
+
 
 		// Calculate the horizontal and vertical delta vectors from pixel to pixel.
 		pixel_delta_u = viewport_u / float(image_width);
 		pixel_delta_v = viewport_v / float(image_height);
 
 		// Calculate the location of the upper left pixel.
-		auto viewport_upper_left =
-			center - glm::vec3(0, 0, focal_length) - viewport_u / 2.0f - viewport_v / 2.0f;
+		auto viewport_upper_left = center - (focal_length * w) - viewport_u / 2.0f - viewport_v / 2.0f;
 		pixel00_loc = viewport_upper_left + 0.5f * (pixel_delta_u + pixel_delta_v);
+	}
+
+	void render_lines(const hittable& world)
+	{
+		int current_line;
+		while ((current_line = next_scanline++) < image_height) {
+			std::clog << "\rScanlines remaining: " << image_height - current_line << ' ' << std::flush;
+
+			for (int i = 0; i < image_width; i++) {
+				color pixel_color(0, 0, 0);
+				for (int sample = 0; sample < samples_per_pixel; sample++) {
+					ray r = get_ray(i, current_line);
+					pixel_color += ray_color(r, max_depth, world);
+				}
+				pixel_colors[(current_line * image_width) + i] = pixel_color;
+			}
+		}
 	}
 
 	ray get_ray(int i, int j) const {
