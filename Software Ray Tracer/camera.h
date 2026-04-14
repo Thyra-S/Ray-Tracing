@@ -2,6 +2,11 @@
 #define CAMERA_H
 
 #include "hittable.h"
+#include "material.h"
+#include <thread>
+#include <atomic>
+
+using namespace std;
 
 class camera {
 public:
@@ -9,25 +14,48 @@ public:
 	int    image_width = 100;  // Rendered image width in pixel count
 	int	   samples_per_pixel = 10; // Number of rays to cast per pixel for anti-aliasing
 	int    max_depth = 10;   // Maximum number of ray bounces into scene
+	int thread_count = 24;
 
 	void render(const hittable& world) {
 		initialize();
 
 		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
-		for (int j = 0; j < image_height; j++) {
-			std::clog << "\rScanlines remaining: " << (image_height - j) << ' ' << std::flush;
+		next_scanline = 0;
+		std::vector<std::thread> threads;
+
+		for (int i = 0; i < thread_count; i++)
+		{
+			threads.emplace_back(&camera::render_lines, this, std::ref(world));
+		}
+		
+		
+		for (std::thread& t : threads)
+			if (t.joinable())
+				t.join();
+
+		for (int i = 0; i < image_height; i++)
+			for (int j = 0; j < image_width; j++)
+				write_color(std::cout, pixel_samples_scale * pixel_colors[(i * image_width) + j]);
+
+		std::clog << "\rDone.                 \n";
+	}
+
+	void render_lines( const hittable& world)
+	{
+		int current_line;
+		while ((current_line = next_scanline++)<image_height) {
+			std::clog << "\rScanlines remaining: " << image_height-current_line << ' ' << std::flush;
+
 			for (int i = 0; i < image_width; i++) {
 				color pixel_color(0, 0, 0);
 				for (int sample = 0; sample < samples_per_pixel; sample++) {
-					ray r = get_ray(i, j);
-					pixel_color += ray_color(r,max_depth, world);
+					ray r = get_ray(i, current_line);
+					pixel_color += ray_color(r, max_depth, world);
 				}
-				write_color(std::cout, pixel_samples_scale * pixel_color);
+				pixel_colors[(current_line * image_width) + i] = pixel_color;
 			}
 		}
-
-		std::clog << "\rDone.                 \n";
 	}
 
 private:
@@ -39,11 +67,16 @@ private:
 	glm::vec3   pixel_delta_u;  // Offset to pixel to the right
 	glm::vec3   pixel_delta_v;  // Offset to pixel below
 
+	atomic<int> next_scanline;
+	vector<color> pixel_colors;
+
 	void initialize() {
 		image_height = int(image_width / aspect_ratio);
 		image_height = (image_height < 1) ? 1 : image_height;
 
-		pixel_samples_scale = 1.0 / samples_per_pixel;
+		pixel_colors.resize(image_height * image_width);
+
+		pixel_samples_scale = 1.0f / samples_per_pixel;
 
 		center = point3(0, 0, 0);
 
@@ -92,8 +125,12 @@ private:
 
 		hit_record rec;
 		if (world.hit(r, interval(0.001f, infinity), rec)) {
-			glm::vec3 direction = rec.normal + random_unit_vector();
-			return 0.5f * ray_color(ray(rec.p, direction), depth -1, world);
+			ray scattered;
+			color attenuation;
+			if (rec.mat->scatter(r, rec, attenuation, scattered))
+				return attenuation * ray_color(scattered, depth - 1, world);
+
+			return color(0, 0, 0);
 		}
 
 

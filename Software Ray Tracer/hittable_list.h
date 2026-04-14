@@ -2,7 +2,6 @@
 #define HITTABLE_LIST_H
 
 #include "hittable.h"
-#include <vector>
 
 class hittable_list : public hittable {
 public:

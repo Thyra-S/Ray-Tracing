@@ -6,7 +6,7 @@
 class sphere : public hittable
 {
 public:															// Ensure that the radius is non-negative.
-	sphere(const point3& center, float radius) : center(center), radius(std::fmaxf(0.0f, radius)) {}
+	sphere(const point3& center, float radius, shared_ptr<material> mat) : center(center), radius(std::fmaxf(0.0f, radius)), mat(mat) {}
 
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
@@ -34,12 +34,14 @@ public:															// Ensure that the radius is non-negative.
 		rec.p = r.at(rec.t);
 		glm::vec3 outward_normal = (rec.p - center) / radius;
 		rec.set_face_normal(r, outward_normal);
+		rec.mat = mat;
 		
 		return true;
 	}
 private:
 	point3 center;
 	float radius;
+	shared_ptr<material> mat;
 };
 
 #endif // !SPHERE_H
