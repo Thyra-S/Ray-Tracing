@@ -10,7 +10,8 @@ public:
 
 	virtual bool scatter(
 		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-	) const {
+	) const 
+	{
 		return false;
 	}
 };
@@ -21,7 +22,8 @@ public:
 	lambertian(const color& albedo) : albedo(albedo) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-		const override {
+		const override 
+	{
 		auto scatter_direction = rec.normal + random_unit_vector();
 
 		if (near_zero(scatter_direction))
@@ -41,7 +43,8 @@ class metal : public material {
 	  metal(const color& albedo, float fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
     bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override {
+    const override
+	{
         glm::vec3 reflected = reflect(r_in.direction(), rec.normal);
 		reflected = glm::normalize(reflected) + (fuzz * random_unit_vector());
         scattered = ray(rec.p, reflected);
@@ -54,12 +57,14 @@ class metal : public material {
 	float fuzz;
 };
 
-class dielectric : public material {
+class dielectric : public material 
+{
   public:
 	dielectric(float refraction_index) : refraction_index(refraction_index) {}
 
 	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-	const override {
+	const override 
+	{
 		attenuation = color(1.0f, 1.0f, 1.0f);
 		float ri = rec.front_face ? (1.0f /refraction_index) : refraction_index;
 
@@ -81,7 +86,8 @@ class dielectric : public material {
   private:
 	float refraction_index;
 
-	static float reflectance(float cosine, float ref_idx) {
+	static float reflectance(float cosine, float ref_idx) 
+	{
 		// Use Schlick's approximation for reflectance.
 		auto r0 = (1.0f - ref_idx) / (1.0f + ref_idx);
 		r0 = r0 * r0;
