@@ -23,7 +23,8 @@ int main()
 
 				if (choose_mat < 0.8f) {
 					// diffuse
-					auto albedo = random_unit_vector() * random_unit_vector();
+					auto albedo = glm::vec3(random_float(), random_float(), random_float()) 
+								* glm::vec3(random_float(),random_float(),random_float());
 					sphere_material = make_shared<lambertian>(albedo);
 					auto center2 = center + glm::vec3(0, random_float(0,0.5f), 0);
 					world.add(make_shared<sphere>(center,center2, 0.2f, sphere_material));

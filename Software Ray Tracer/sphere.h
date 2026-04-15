@@ -27,7 +27,7 @@ public:															// Ensure that the radius is non-negative.
 		auto sqrt_discriminant = sqrt(discriminant);
 
 		// Find the nearest root that lies in the acceptable range.
-		auto root = (-h - sqrt_discriminant) / a;
+		auto root = (h - sqrt_discriminant) / a;
 		if (!ray_t.surrounds(root))
 		{
 			root = (-h + sqrt_discriminant) / a; // Try the other root.
