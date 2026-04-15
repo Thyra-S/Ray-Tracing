@@ -25,7 +25,8 @@ int main()
 					// diffuse
 					auto albedo = random_unit_vector() * random_unit_vector();
 					sphere_material = make_shared<lambertian>(albedo);
-					world.add(make_shared<sphere>(center, 0.2f, sphere_material));
+					auto center2 = center + glm::vec3(0, random_float(0,0.5f), 0);
+					world.add(make_shared<sphere>(center,center2, 0.2f, sphere_material));
 				}
 				else if (choose_mat < 0.95f) {
 					// metal
@@ -36,37 +37,37 @@ int main()
 				}
 				else {
 					// glass
-					sphere_material = make_shared<dielectric>(1.5);
-					world.add(make_shared<sphere>(center, 0.2, sphere_material));
+					sphere_material = make_shared<dielectric>(1.5f);
+					world.add(make_shared<sphere>(center, 0.2f, sphere_material));
 				}
 			}
 		}
 	}
 
-	auto material1 = make_shared<dielectric>(1.5);
-	world.add(make_shared<sphere>(point3(0, 1, 0), 1.0, material1));
+	auto material1 = make_shared<dielectric>(1.5f);
+	world.add(make_shared<sphere>(point3(0.0f, 1.0f, 0.0f), 1.0f, material1));
 
-	auto material2 = make_shared<lambertian>(color(0.4, 0.2, 0.1));
-	world.add(make_shared<sphere>(point3(-4, 1, 0), 1.0, material2));
+	auto material2 = make_shared<lambertian>(color(0.4f, 0.2f, 0.1f));
+	world.add(make_shared<sphere>(point3(-4.0f, 1.0f, 0.0f), 1.0f, material2));
 
-	auto material3 = make_shared<metal>(color(0.7, 0.6, 0.5), 0.0);
-	world.add(make_shared<sphere>(point3(4, 1, 0), 1.0, material3));
+	auto material3 = make_shared<metal>(color(0.7f, 0.6f, 0.5f), 0.0f);
+	world.add(make_shared<sphere>(point3(4.0f, 1.0f, 0.0f), 1.0f, material3));
 
 	camera cam;
 
-	cam.aspect_ratio = 16.0f / 9.0f;
-	cam.image_width = 2560;
-	cam.samples_per_pixel = 512;
-	cam.max_depth = 50;
-	cam.thread_count = 24;
+	cam.aspect_ratio	  = 16.0f / 9.0f;
+	cam.image_width		  = 400;
+	cam.samples_per_pixel = 16;
+	cam.max_depth		  = 50;
+	cam.thread_count	  = 12;
 
-	cam.vfov = 20;
+	cam.vfov	 = 20;
 	cam.lookfrom = point3(13, 2, 3);
-	cam.lookat = point3(0, 0, 0);
-	cam.vup = glm::vec3(0, 1, 0);
+	cam.lookat	 = point3(0, 0, 0);
+	cam.vup		 = glm::vec3(0, 1, 0);
 
 	cam.defocus_angle = 0.6f;
-	cam.focus_dist = 10.0f;
+	cam.focus_dist	  = 10.0f;
 
 	cam.render(world);
 }
