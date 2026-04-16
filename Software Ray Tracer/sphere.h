@@ -7,10 +7,20 @@ class sphere : public hittable
 {
 public:															// Ensure that the radius is non-negative.
 	sphere(const point3& static_center, float radius, shared_ptr<material> mat) 
-		: center(static_center, glm::vec3(0,0,0)), radius(std::fmaxf(0.0f, radius)), mat(mat) {}
+		: center(static_center, glm::vec3(0,0,0)), radius(std::fmaxf(0.0f, radius)), mat(mat) 
+	{
+		auto rvec = glm::vec3(radius, radius, radius);
+		bbox = aabb(static_center - rvec, static_center + rvec);
+	}
 
 	sphere(const point3& center1, const point3& center2, float radius, shared_ptr<material> mat)
-		: center(center1, center2-center1), radius(std::fmaxf(0.0f, radius)), mat(mat) {}
+		: center(center1, center2-center1), radius(std::fmaxf(0.0f, radius)), mat(mat) 
+	{
+		auto rvec = glm::vec3(radius, radius, radius);
+		aabb box1(center.at(0) - rvec, center.at(0) + rvec);
+		aabb box2(center.at(1) - rvec, center.at(1) + rvec);
+		bbox = aabb(box1, box2);
+	}
 
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override
 	{
@@ -30,7 +40,7 @@ public:															// Ensure that the radius is non-negative.
 		auto root = (h - sqrt_discriminant) / a;
 		if (!ray_t.surrounds(root))
 		{
-			root = (-h + sqrt_discriminant) / a; // Try the other root.
+			root = (h + sqrt_discriminant) / a; // Try the other root.
 			if (!ray_t.surrounds(root))
 				return false; // No roots are in the acceptable range.
 		}
@@ -43,10 +53,14 @@ public:															// Ensure that the radius is non-negative.
 		
 		return true;
 	}
+
+	aabb bounding_box() const override { return bbox; }
+
 private:
 	ray center;
 	float radius;
 	shared_ptr<material> mat;
+	aabb bbox;
 };
 
 #endif // !SPHERE_H

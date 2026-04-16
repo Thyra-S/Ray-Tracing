@@ -1,17 +1,19 @@
 #include "rtweekend_commons.h"
 
+#include "bvh.h"
 #include "camera.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
 #include "sphere.h"
+#include "texture.h"
 
 int main()
 {
 	hittable_list world;
 
-	auto ground_material = make_shared<lambertian>(color(0.5f, 0.5f, 0.5f));
-	world.add(make_shared<sphere>(point3(0, -1000.0f, 0), 1000.0f, ground_material));
+	auto checker = make_shared<checker_texture>(0.32f, color(0.2f, 0.3f, 0.1f), color(0.9f, 0.9f, 0.9f));
+	world.add(make_shared<sphere>(point3(0.0f, -1000.0f, 0.0f), 1000.0f, make_shared<lambertian>(checker)));
 
 	for (int a = -11; a < 11; a++) {
 		for (int b = -11; b < 11; b++) {
@@ -54,11 +56,13 @@ int main()
 	auto material3 = make_shared<metal>(color(0.7f, 0.6f, 0.5f), 0.0f);
 	world.add(make_shared<sphere>(point3(4.0f, 1.0f, 0.0f), 1.0f, material3));
 
+	world = hittable_list(make_shared<bvh_node>(world));
+
 	camera cam;
 
 	cam.aspect_ratio	  = 16.0f / 9.0f;
-	cam.image_width		  = 400;
-	cam.samples_per_pixel = 16;
+	cam.image_width		  = 960;
+	cam.samples_per_pixel = 64;
 	cam.max_depth		  = 50;
 	cam.thread_count	  = 12;
 

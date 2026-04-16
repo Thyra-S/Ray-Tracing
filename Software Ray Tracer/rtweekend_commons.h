@@ -39,6 +39,11 @@ inline float random_float(float min, float max)
 	return min + (max - min) * random_float();
 }
 
+inline int random_int(int min, int max) {
+    // Returns a random integer in [min,max].
+	return int(random_float(min, max + 1));
+}
+
 
 
 
@@ -83,7 +88,7 @@ inline glm::vec3 refract(const glm::vec3& uv, const glm::vec3& n, float etai_ove
 {
 	auto cos_theta = std::fminf(glm::dot(-uv, n), 1.0);
 	glm::vec3 r_out_perp = etai_over_etat * (uv + cos_theta * n);
-	glm::vec3 r_out_parallel = -std::sqrt(std::fabsf(1.0 - glm::dot(r_out_perp,r_out_perp))) * n;
+	glm::vec3 r_out_parallel = -std::sqrt(std::fabsf(1.0f - glm::dot(r_out_perp,r_out_perp))) * n;
 	return r_out_perp + r_out_parallel;
 }
 
