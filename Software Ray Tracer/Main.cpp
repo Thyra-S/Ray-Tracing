@@ -206,7 +206,7 @@ void tris() {
 	auto upper_orange = make_shared<lambertian>(color(1.0f, 0.5f, 0.0f));
 	auto lower_teal = make_shared<lambertian>(color(0.2f, 0.8f, 0.8f));
 
-	// Quads
+	// Quads made of triangles
 	world.add(make_shared<triangle>(point3(-3.0f, -2.0f, 5.0f), glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(0.0f, 4.0f, 0.0f), left_red));
 	world.add(make_shared<triangle>(point3(-3.0f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, -4.0f, 0.0f), right_blue));
 
