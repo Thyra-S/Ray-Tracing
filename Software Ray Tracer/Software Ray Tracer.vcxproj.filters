@@ -79,5 +79,8 @@
     <ClInclude Include="constant_medium.h">
       <Filter>Header Files\Primatives</Filter>
     </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Header Files\Primatives</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

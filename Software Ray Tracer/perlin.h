@@ -7,7 +7,7 @@ public:
 	perlin()
 	{
 		for (int i = 0; i < point_count; i++)
-			randvec[i] = glm::sphericalRand(1.0f);
+			randvec[i] = random_unit_vector();
 
 		perlin_generate_perm(perm_x);
 		perlin_generate_perm(perm_y);

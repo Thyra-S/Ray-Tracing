@@ -76,17 +76,20 @@ private:
 
 class noise_texture : public texture {
 public:
-	noise_texture(float scale) : scale(scale) {}
+	noise_texture(float scale, float turbscale) : scale(scale), turbscale(turbscale) {}
 
-	noise_texture() : noise_texture(1.0f) {}
+	noise_texture(float scale) : noise_texture(scale, 1.0f) {}
+
+	noise_texture() : noise_texture(1.0f,1.0f) {}
 
 	color value(float u, float v, const point3& p) const override {
-		return color(.5, .5, .5) * (1 + std::sin(scale * p.z + 10 * noise.turb(p, 7)));
+		return color(.5, .5, .5) * (1 + std::sin(scale * p.z + 10 * noise.turb(turbscale * p, 7)));
 	}
 
 private:
 	perlin noise;
 	float scale;
+	float turbscale = 1.0f;
 };
 
 #endif
