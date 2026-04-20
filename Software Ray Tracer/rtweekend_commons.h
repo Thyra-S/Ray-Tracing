@@ -28,8 +28,8 @@ inline float degrees_to_radians(float degrees)
 
 inline float random_float() 
 {
-	static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
-	static std::mt19937 generator;
+	static thread_local std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
+	static thread_local std::mt19937 generator(std::random_device{}());
 	return distribution(generator);
 }
 
@@ -60,7 +60,12 @@ using POINT = glm::vec3;
 
 inline glm::vec3 random_unit_vector() 
 {
-	return glm::sphericalRand(1.0f);
+	while (true)
+	{
+		auto p = glm::vec3(random_float(-1.0f, 1.0f), random_float(-1.0f, 1.0f), random_float(-1.0f, 1.0f));
+		if (1e-16f < glm::dot(p, p) && glm::dot(p, p) <= 1.0f)
+			return glm::normalize(p);
+	}
 }
 
 inline glm::vec3 random_on_hemisphere(const glm::vec3& normal) 

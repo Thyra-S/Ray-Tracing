@@ -17,6 +17,8 @@ public:
 	int    max_depth = 10;		   // Maximum number of ray bounces into scene
 	int thread_count = 24;		   // How many threads shuold be used to render the image
 
+	color  background;               // Scene background color
+
 	float vfov = 90;				    // Vertical field of view in degrees
 	point3 lookfrom = point3(0, 0, 0);  // Point camera is looking from
 	point3 lookat = point3(0, 0, -1);   // Point camera is looking at
@@ -157,19 +159,19 @@ private:
 			return color(0, 0, 0);
 
 		hit_record rec;
-		if (world.hit(r, interval(0.001f, infinity), rec)) {
-			ray scattered;
-			color attenuation;
-			if (rec.mat->scatter(r, rec, attenuation, scattered))
-				return attenuation * ray_color(scattered, depth - 1, world);
+		if (!world.hit(r, interval(0.001f, infinity), rec))
+			return background;
+		
+		ray scattered;
+		color attenuation;
+		color color_from_emission = rec.mat->emitted(rec.u, rec.v, rec.p);
+		if (!rec.mat->scatter(r, rec, attenuation, scattered))
+			return color_from_emission;
 
-			return color(0, 0, 0);
-		}
+		color color_from_scatter = attenuation * ray_color(scattered, depth - 1, world);
 
-
-		auto unit_direction = glm::normalize(r.direction());
-		auto a = 0.5f * (unit_direction.y + 1.0f);
-		return (1.0f - a) * color(1.0f, 1.0f, 1.0f) + a * color(0.5f, 0.7f, 1.0f);
+		return color_from_emission + color_from_scatter;
+	
 	}
 };
 

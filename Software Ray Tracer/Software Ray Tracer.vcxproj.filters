@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Primatives">
+      <UniqueIdentifier>{f95f85cf-b05c-4e07-a15c-5bab08be501a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -32,9 +35,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hittable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="sphere.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="hittable_list.h">
@@ -60,6 +60,21 @@
     </ClInclude>
     <ClInclude Include="texture.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rt_stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="perlin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="quad.h">
+      <Filter>Header Files\Primatives</Filter>
+    </ClInclude>
+    <ClInclude Include="sphere.h">
+      <Filter>Header Files\Primatives</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
