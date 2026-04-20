@@ -37,7 +37,7 @@ public:
 		if (rec1.t < 0)
 			rec1.t = 0;
 
-		auto ray_length = r.direction().length();
+		auto ray_length = glm::length(r.direction());
 		auto distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
 		auto hit_distance = neg_inv_density * std::log(random_float());
 

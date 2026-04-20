@@ -291,8 +291,8 @@ void cornell_smoke() {
 	box2 = make_shared<rotate_y>(box2, -18);
 	box2 = make_shared<translate>(box2, glm::vec3(130, 0, 65));
 
-	world.add(make_shared<constant_medium>(box1, 0.01, color(0, 0, 0)));
-	world.add(make_shared<constant_medium>(box2, 0.01, color(1, 1, 1)));
+	world.add(make_shared<constant_medium>(box1, 0.01f, color(0, 0, 0)));
+	world.add(make_shared<constant_medium>(box2, 0.01f, color(1, 1, 1)));
 
 	camera cam;
 
@@ -301,8 +301,9 @@ void cornell_smoke() {
 	cam.samples_per_pixel = 200;
 	cam.max_depth = 50;
 	cam.background = color(0, 0, 0);
+	cam.thread_count = THREAD_COUNT;
 
-	cam.vfov = 40;
+	cam.vfov = 40.0f;
 	cam.lookfrom = point3(278, 278, -800);
 	cam.lookat = point3(278, 278, 0);
 	cam.vup = glm::vec3(0, 1, 0);
@@ -314,7 +315,7 @@ void cornell_smoke() {
 
 int main()
 {
-	switch (7)
+	switch (8)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
