@@ -76,5 +76,8 @@
     <ClInclude Include="sphere.h">
       <Filter>Header Files\Primatives</Filter>
     </ClInclude>
+    <ClInclude Include="constant_medium.h">
+      <Filter>Header Files\Primatives</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

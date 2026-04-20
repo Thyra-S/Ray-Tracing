@@ -42,7 +42,7 @@ public:
 	interval expand(float delta) const
 	{
 		auto padding = delta / 2;
-		return interval(min - padding, max + padding);
+		return {min - padding, max + padding};
 	}
 
 	static const interval empty, universe;

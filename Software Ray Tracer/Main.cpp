@@ -1,6 +1,7 @@
 #include "rtweekend_commons.h"
 #include "bvh.h"
 #include "camera.h"
+#include "constant_medium.h"
 #include "hittable.h"
 #include "hittable_list.h"
 #include "material.h"
@@ -238,8 +239,60 @@ void cornell_box() {
 	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
 	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
 
-	world.add(box(point3(130, 0, 65), point3(295, 165, 230), white));
-	world.add(box(point3(265, 0, 295), point3(430, 330, 460), white));
+	shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+	box1 = make_shared<rotate_y>(box1, 15);
+	box1 = make_shared<translate>(box1, glm::vec3(265, 0, 295));
+	world.add(box1);
+
+	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+	box2 = make_shared<rotate_y>(box2, -18);
+	box2 = make_shared<translate>(box2, glm::vec3(130, 0, 65));
+	world.add(box2);
+
+	camera cam;
+
+	cam.aspect_ratio = 1.0f;
+	cam.image_width = 600;
+	cam.samples_per_pixel = 200;
+	cam.max_depth = 50;
+	cam.thread_count = THREAD_COUNT;
+	cam.background = color(0, 0, 0);
+
+	cam.vfov = 40;
+	cam.lookfrom = point3(278, 278, -800);
+	cam.lookat = point3(278, 278, 0);
+	cam.vup = glm::vec3(0, 1, 0);
+
+	cam.defocus_angle = 0;
+
+	cam.render(world);
+}
+
+void cornell_smoke() {
+	hittable_list world;
+
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto light = make_shared<diffuse_light>(color(7, 7, 7));
+
+	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), red));
+	world.add(make_shared<quad>(point3(113, 554, 127), glm::vec3(330, 0, 0), glm::vec3(0, 0, 305), light));
+	world.add(make_shared<quad>(point3(0, 555, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
+
+	shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+	box1 = make_shared<rotate_y>(box1, 15);
+	box1 = make_shared<translate>(box1, glm::vec3(265, 0, 295));
+
+	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+	box2 = make_shared<rotate_y>(box2, -18);
+	box2 = make_shared<translate>(box2, glm::vec3(130, 0, 65));
+
+	world.add(make_shared<constant_medium>(box1, 0.01, color(0, 0, 0)));
+	world.add(make_shared<constant_medium>(box2, 0.01, color(1, 1, 1)));
 
 	camera cam;
 
@@ -247,7 +300,6 @@ void cornell_box() {
 	cam.image_width = 600;
 	cam.samples_per_pixel = 200;
 	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
 	cam.background = color(0, 0, 0);
 
 	cam.vfov = 40;
@@ -271,6 +323,7 @@ int main()
 		case 5: quads(); break;
 		case 6: simple_light(); break;
 		case 7: cornell_box(); break;
+		case 8: cornell_smoke(); break;
 	}
 	
 }
