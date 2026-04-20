@@ -196,6 +196,51 @@ void quads() {
 	cam.render(world);
 }
 
+void tris() {
+	hittable_list world;
+
+	// Materials
+	auto left_red = make_shared<lambertian>(color(1.0f, 0.2f, 0.2f));
+	auto back_green = make_shared<lambertian>(color(0.2f, 1.0f, 0.2f));
+	auto right_blue = make_shared<lambertian>(color(0.2f, 0.2f, 1.0f));
+	auto upper_orange = make_shared<lambertian>(color(1.0f, 0.5f, 0.0f));
+	auto lower_teal = make_shared<lambertian>(color(0.2f, 0.8f, 0.8f));
+
+	// Quads
+	world.add(make_shared<triangle>(point3(-3.0f, -2.0f, 5.0f), glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(0.0f, 4.0f, 0.0f), left_red));
+	world.add(make_shared<triangle>(point3(-3.0f, 2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, -4.0f, 0.0f), right_blue));
+
+	world.add(make_shared<triangle>(point3(-2.0f, -2.0f, 0.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 4.0f, 0.0f), back_green));
+	world.add(make_shared<triangle>(point3(2.0f, 2.0f, 0.0f), glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, -4.0f, 0.0f), upper_orange));
+
+	world.add(make_shared<triangle>(point3(3.0f, -2.0f, 1.0f), glm::vec3(0.0f, 0.0f, 4.0f), glm::vec3(0.0f, 4.0f, 0.0f), right_blue));
+	world.add(make_shared<triangle>(point3(3.0f, 2.0f, 5.0f), glm::vec3(0.0f, 0.0f, -4.0f), glm::vec3(0.0f, -4.0f, 0.0f), left_red));
+
+	world.add(make_shared<triangle>(point3(-2.0f, 3.0f, 1.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 4.0f), upper_orange));
+	world.add(make_shared<triangle>(point3(2.0f, 3.0f, 5.0f), glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -4.0f), lower_teal));
+
+	world.add(make_shared<triangle>(point3(-2.0f, -3.0f, 5.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -4.0f), lower_teal));
+	world.add(make_shared<triangle>(point3(2.0f, -3.0f, 1.0f), glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 4.0f), back_green));
+
+	camera cam;
+
+	cam.aspect_ratio = 1.0f;
+	cam.image_width = 400;
+	cam.samples_per_pixel = 100;
+	cam.max_depth = 50;
+	cam.thread_count = THREAD_COUNT;
+	cam.background = color(0.70, 0.80, 1.00);
+
+	cam.vfov = 80.0f;
+	cam.lookfrom = point3(0.0f, 0.0f, 9.0f);
+	cam.lookat = point3(0.0f, 0.0f, 0.0f);
+	cam.vup = glm::vec3(0.0f, 1.0f, 0.0);
+
+	cam.defocus_angle = 0.0f;
+
+	cam.render(world);
+}
+
 void simple_light() {
 	hittable_list world;
 
@@ -394,17 +439,18 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 int main()
 {
-	switch (10)
+	switch (6)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
 		case 3: earth(); break;
 		case 4: perlin_spheres(); break;
 		case 5: quads(); break;
-		case 6: simple_light(); break;
-		case 7: cornell_box(); break;
-		case 8: cornell_smoke(); break;
-		case 9: final_scene(800, 10000, 50); break;
+		case 6: tris(); break;
+		case 7: simple_light(); break;
+		case 8: cornell_box(); break;
+		case 9: cornell_smoke(); break;
+		case 10: final_scene(800, 10000, 50); break;
 		default: final_scene(200, 200, 50); break;
 	}
 	
