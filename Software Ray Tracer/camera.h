@@ -5,6 +5,7 @@
 #include "material.h"
 #include <thread>
 #include <atomic>
+#include <fstream>
 
 using namespace std;
 
@@ -16,6 +17,8 @@ public:
 	int	   samples_per_pixel = 10; // Number of rays to cast per pixel for anti-aliasing
 	int    max_depth = 10;		   // Maximum number of ray bounces into scene
 	int thread_count = 24;		   // How many threads shuold be used to render the image
+
+	std::ofstream image_file = std::ofstream("Renders/image.ppm");		// Output file stream for rendered image
 
 	color  background;               // Scene background color
 
@@ -31,7 +34,7 @@ public:
 	{
 		initialize();
 
-		std::cout << "P3\n" << image_width << ' ' << image_height << "\n255\n";
+		image_file << "P3\n" << image_width << ' ' << image_height << "\n255\n";
 
 		next_scanline = 0;
 		std::vector<std::thread> threads;
@@ -49,7 +52,7 @@ public:
 		std::clog << "\r Writing image to ppm " << std::flush;
 		for (int i = 0; i < image_height; i++)
 			for (int j = 0; j < image_width; j++)
-				write_color(std::cout, pixel_samples_scale * pixel_colors[(i * image_width) + j]);
+				write_color(image_file, pixel_samples_scale * pixel_colors[(i * image_width) + j]);
 
 		std::clog << "\rDone.                 \n";
 	}

@@ -2,7 +2,8 @@
 #define COLOR_H
 
 #include "interval.h"
-#include <glm.hpp>
+#include <glm/glm.hpp>
+#include <fstream>
 
 using color = glm::vec3;
 
@@ -12,7 +13,7 @@ inline float linear_to_gamma(float linear) {
 
 	return 0;
 }
-void write_color(std::ostream& out, const color& pixel_color) 
+void write_color(std::ofstream& image_file, const color& pixel_color) 
 {
 	auto r = pixel_color.r;
 	auto g = pixel_color.g;
@@ -29,7 +30,7 @@ void write_color(std::ostream& out, const color& pixel_color)
 	int bbyte = int(256 * intensity.clamp(b));
 
 	// Write out the pixel color components.
-	out << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
+	image_file << rbyte << ' ' << gbyte << ' ' << bbyte << '\n';
 }
 
 #endif#pragma once

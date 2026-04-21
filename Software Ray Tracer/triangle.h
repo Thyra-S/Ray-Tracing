@@ -87,4 +87,35 @@ inline shared_ptr<hittable> make_triangle(const point3& A, const point3& B, cons
 	return make_shared<triangle>(A, B - A, C - A, mat);
 }
 
+inline shared_ptr<hittable> tetrahedron(const point3& A, const point3& B, const point3& C, const point3& D, shared_ptr<material> mat)
+{
+	auto list = make_shared<hittable_list>();
+
+	// Calculate the center (centroid) of the tetrahedron
+	point3 center = (A + B + C + D) / 4.0f;
+
+	// Helper lambda to automatically fix the winding order
+	auto add_outward_face = [&](const point3& v0, const point3& v1, const point3& v2) {
+		glm::vec3 u = v1 - v0;
+		glm::vec3 v = v2 - v0;
+		glm::vec3 n = glm::cross(u, v);
+
+		glm::vec3 center_to_face = v0 - center;
+
+		// If the normal points towards the center, swap v1 and v2 to flip the normal
+		if (glm::dot(n, center_to_face) < 0) {
+			list->add(make_triangle(v0, v2, v1, mat));
+		}
+		else {
+			list->add(make_triangle(v0, v1, v2, mat));
+		}
+		};
+
+	add_outward_face(A, B, C);
+	add_outward_face(A, C, D);
+	add_outward_face(A, D, B);
+	add_outward_face(B, D, C);
+
+	return list;
+}
 #endif

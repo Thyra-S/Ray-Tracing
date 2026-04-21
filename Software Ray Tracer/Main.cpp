@@ -10,7 +10,7 @@
 #include "triangle.h"
 #include "texture.h"
 
-#define THREAD_COUNT 12
+#define THREAD_COUNT 4
 
 void bouncing_spheres()
 {
@@ -276,6 +276,7 @@ void cornell_box() {
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto blue = make_shared<lambertian>(color(.12, .15, .45));
 	auto light = make_shared<diffuse_light>(color(15, 15, 15));
 
 	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
@@ -285,9 +286,28 @@ void cornell_box() {
 	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
 	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
 
-	shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
-	box1 = make_shared<rotate_y>(box1, 15);
-	box1 = make_shared<translate>(box1, glm::vec3(265, 0, 295));
+	// Place the tetrahedron in the right half of the Cornell box, resting on the floor (y=0)
+	double s = 200;
+
+	// Calculate the vertices for a perfectly equilateral tetrahedron
+	point3 A(0, 0, 0);
+	point3 B(0, 0, s);
+	point3 C(s * std::sqrt(3.0) / 2.0, 0, s / 2.0);
+
+	// The peak sits above the centroid of the base
+	double centroid_x = s * std::sqrt(3.0) / 6.0;
+	double centroid_z = s / 2.0;
+	double height = s * std::sqrt(2.0 / 3.0);
+	point3 D(centroid_x, height, centroid_z);
+
+	// Create the tetrahedron
+	auto glass  = make_shared<dielectric>(1.5f);
+	shared_ptr<hittable> box1 = tetrahedron(A, B, C, D, glass);
+
+	//shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+	box1 = make_shared<rotate_y>(box1, 75);
+	box1 = make_shared<translate>(box1, glm::vec3(300, 20, 300));
+	
 	world.add(box1);
 
 	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
@@ -299,7 +319,7 @@ void cornell_box() {
 
 	cam.aspect_ratio = 1.0f;
 	cam.image_width = 600;
-	cam.samples_per_pixel = 200;
+	cam.samples_per_pixel = 1000;
 	cam.max_depth = 50;
 	cam.thread_count = THREAD_COUNT;
 	cam.background = color(0, 0, 0);
@@ -379,7 +399,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	}
 
 	hittable_list world;
-
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	world.add(make_shared<bvh_node>(boxes1));
 
 	auto light = make_shared<diffuse_light>(color(7, 7, 7));
@@ -391,9 +411,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	world.add(make_shared<sphere>(center1, center2, 50, sphere_material));
 
 	world.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
-	world.add(make_shared<sphere>(
-		point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)
-	));
+	world.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
 
 	auto boundary = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
 	world.add(boundary);
@@ -401,13 +419,15 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	boundary = make_shared<sphere>(point3(0, 0, 0), 5000, make_shared<dielectric>(1.5));
 	world.add(make_shared<constant_medium>(boundary, .0001, color(1, 1, 1)));
 
+	// Dielectric tetrahedron at center of scene
+	world.add(make_shared<triangle>(point3(400, 200, 400), point3(430, 200, 400), point3(415, 230, 400), make_shared<dielectric>(1.5)));
+
 	auto emat = make_shared<lambertian>(make_shared<image_texture>("earthmap.jpg"));
 	world.add(make_shared<sphere>(point3(400, 200, 400), 100, emat));
 	auto pertext = make_shared<noise_texture>(0.02f, 0.01f);
 	world.add(make_shared<sphere>(point3(220, 280, 300), 80, make_shared<lambertian>(pertext)));
 
 	hittable_list boxes2;
-	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	int ns = 1000;
 	for (int j = 0; j < ns; j++) {
 		boxes2.add(make_shared<sphere>(point3(random_float(0, 165), random_float(0, 165), random_float(0, 165)), 10, white));
@@ -421,11 +441,13 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 	camera cam;
 
-	cam.aspect_ratio = 1.0;
+	cam.aspect_ratio = 16.0f/9.0f;
 	cam.image_width = image_width;
 	cam.samples_per_pixel = samples_per_pixel;
 	cam.max_depth = max_depth;
 	cam.background = color(0, 0, 0);
+	cam.thread_count = THREAD_COUNT;
+	cam.image_file = std::ofstream("Renders/image.ppm");
 
 	cam.vfov = 40.0f;
 	cam.lookfrom = point3(478, 278, -600);
@@ -439,7 +461,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 int main()
 {
-	switch (6)
+	switch (8)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
@@ -451,7 +473,6 @@ int main()
 		case 8: cornell_box(); break;
 		case 9: cornell_smoke(); break;
 		case 10: final_scene(800, 10000, 50); break;
-		default: final_scene(200, 200, 50); break;
+		default: final_scene(400, 50, 50); break;
 	}
-	
 }
