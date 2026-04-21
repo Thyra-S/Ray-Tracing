@@ -8,13 +8,13 @@
 class constant_medium : public hittable {
 public:
 	constant_medium(shared_ptr<hittable> boundary, float density, shared_ptr<texture> tex)
-		: boundary(boundary), neg_inv_density(-1 / density),
+		: boundary(boundary), neg_inv_density(-1.0f / density),
 		phase_function(make_shared<isotropic>(tex))
 	{
 	}
 
 	constant_medium(shared_ptr<hittable> boundary, float density, const color& albedo)
-		: boundary(boundary), neg_inv_density(-1 / density),
+		: boundary(boundary), neg_inv_density(-1.0f / density),
 		phase_function(make_shared<isotropic>(albedo))
 	{
 	}
@@ -58,7 +58,7 @@ public:
 
 private:
 	shared_ptr<hittable> boundary;
-	double neg_inv_density;
+	float neg_inv_density;
 	shared_ptr<material> phase_function;
 };
 

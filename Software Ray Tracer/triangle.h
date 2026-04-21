@@ -118,4 +118,24 @@ inline shared_ptr<hittable> tetrahedron(const point3& A, const point3& B, const 
 
 	return list;
 }
+
+inline shared_ptr <hittable> equilateral_tetrahedron(float edge_length, shared_ptr<material> mat)
+{
+	// edge length of the tetrahedron
+	float s = 200;
+
+	// Calculate the vertices for a perfectly equilateral tetrahedron
+	point3 A(0, 0, 0);
+	point3 B(0, 0, s);
+	point3 C(s * std::sqrt(3.0f) / 2.0f, 0, s / 2.0f);
+
+	// The peak sits above the centroid of the base
+	float centroid_x = s * std::sqrt(3.0f) / 6.0f;
+	float centroid_z = s / 2.0f;
+	float height = s * std::sqrt(2.0f / 3.0f);
+	point3 D(centroid_x, height, centroid_z);
+
+	return tetrahedron(A, B, C, D, mat);
+}
+
 #endif

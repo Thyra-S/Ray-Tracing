@@ -52,6 +52,9 @@ inline int random_int(int min, int max) {
 #include "color.h"
 #include "interval.h"
 #include "ray.h"
+
+#define GLM_FORCE_INTRINSICS // Tells GLM to use SIMD instructions
+#define GLM_FORCE_AVX2       // Tells GLM to use AVX2 specifically
 #include <glm/glm.hpp>
 #include <glm/gtc/random.hpp>
 

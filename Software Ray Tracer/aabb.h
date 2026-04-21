@@ -78,6 +78,21 @@ public:
 			return y.size() > z.size() ? 1 : 2;
 	}
 
+	float surface_area() const 
+	{
+		float dx = x.size();
+		float dy = y.size();
+		float dz = z.size();
+		return 2.0f * (dx * dy + dx * dz + dy * dz);
+	}
+
+	point3 center() const 
+	{
+		return point3(x.min + x.size() / 2.0,
+			y.min + y.size() / 2.0,
+			z.min + z.size() / 2.0);
+	}
+
 	static const aabb empty, universe;
 
 private:

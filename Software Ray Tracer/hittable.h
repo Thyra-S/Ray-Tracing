@@ -65,7 +65,7 @@ private:
 
 class rotate_y : public hittable {
 public:
-	rotate_y(shared_ptr<hittable> object, double angle) : object(object) 
+	rotate_y(shared_ptr<hittable> object, float angle) : object(object) 
 	{
 		auto radians = degrees_to_radians(angle);
 		sin_theta = std::sin(radians);

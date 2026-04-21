@@ -286,7 +286,7 @@ void cornell_box() {
 	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
 	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
 
-	// Place the tetrahedron in the right half of the Cornell box, resting on the floor (y=0)
+	// edge length of the tetrahedron
 	double s = 200;
 
 	// Calculate the vertices for a perfectly equilateral tetrahedron
@@ -302,13 +302,13 @@ void cornell_box() {
 
 	// Create the tetrahedron
 	auto glass  = make_shared<dielectric>(1.5f);
-	shared_ptr<hittable> box1 = tetrahedron(A, B, C, D, glass);
+	shared_ptr<hittable> tet1 = tetrahedron(A, B, C, D, glass);
 
 	//shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
-	box1 = make_shared<rotate_y>(box1, 75);
-	box1 = make_shared<translate>(box1, glm::vec3(300, 20, 300));
+	tet1 = make_shared<rotate_y>(tet1, 75);
+	tet1 = make_shared<translate>(tet1, glm::vec3(300, 20, 300));
 	
-	world.add(box1);
+	world.add(tet1);
 
 	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
 	box2 = make_shared<rotate_y>(box2, -18);
@@ -411,7 +411,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	world.add(make_shared<sphere>(center1, center2, 50, sphere_material));
 
 	world.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
-	world.add(make_shared<sphere>(point3(0, 150, 145), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
+	world.add(make_shared<sphere>(point3(60, 180, 200), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
 
 	auto boundary = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
 	world.add(boundary);
@@ -420,7 +420,11 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	world.add(make_shared<constant_medium>(boundary, .0001, color(1, 1, 1)));
 
 	// Dielectric tetrahedron at center of scene
-	world.add(make_shared<triangle>(point3(400, 200, 400), point3(430, 200, 400), point3(415, 230, 400), make_shared<dielectric>(1.5)));
+	auto tet = equilateral_tetrahedron(360, make_shared<dielectric>(1.5));
+	tet = make_shared<rotate_y>(tet, 90);
+	tet = make_shared<translate>(tet, glm::vec3(-80, 100, 100));
+
+	world.add(tet);
 
 	auto emat = make_shared<lambertian>(make_shared<image_texture>("earthmap.jpg"));
 	world.add(make_shared<sphere>(point3(400, 200, 400), 100, emat));
@@ -441,7 +445,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 	camera cam;
 
-	cam.aspect_ratio = 16.0f/9.0f;
+	cam.aspect_ratio = 16.0f/10.0f;
 	cam.image_width = image_width;
 	cam.samples_per_pixel = samples_per_pixel;
 	cam.max_depth = max_depth;
@@ -461,7 +465,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 int main()
 {
-	switch (8)
+	switch (11)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
@@ -473,6 +477,6 @@ int main()
 		case 8: cornell_box(); break;
 		case 9: cornell_smoke(); break;
 		case 10: final_scene(800, 10000, 50); break;
-		default: final_scene(400, 50, 50); break;
+		default: final_scene(2560, 50, 50); break;
 	}
 }

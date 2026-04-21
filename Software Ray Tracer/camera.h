@@ -16,7 +16,7 @@ public:
 	int    image_width = 100;	   // Rendered image width in pixel count
 	int	   samples_per_pixel = 10; // Number of rays to cast per pixel for anti-aliasing
 	int    max_depth = 10;		   // Maximum number of ray bounces into scene
-	int thread_count = 24;		   // How many threads shuold be used to render the image
+	int thread_count = 24;		   // How many threads should be used to render the image
 
 	std::ofstream image_file = std::ofstream("Renders/image.ppm");		// Output file stream for rendered image
 
