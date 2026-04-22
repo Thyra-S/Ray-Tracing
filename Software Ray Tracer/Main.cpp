@@ -10,7 +10,7 @@
 #include "triangle.h"
 #include "texture.h"
 
-#define THREAD_COUNT 4
+#define THREAD_COUNT 8
 
 void bouncing_spheres()
 {
@@ -465,7 +465,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 int main()
 {
-	switch (11)
+	switch (10)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
@@ -476,7 +476,7 @@ int main()
 		case 7: simple_light(); break;
 		case 8: cornell_box(); break;
 		case 9: cornell_smoke(); break;
-		case 10: final_scene(800, 10000, 50); break;
+		case 10: final_scene(2880, 10000, 50); break;
 		default: final_scene(2560, 50, 50); break;
 	}
 }
