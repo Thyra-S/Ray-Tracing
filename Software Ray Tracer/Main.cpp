@@ -8,7 +8,12 @@
 #include "sphere.h"
 #include "quad.h"
 #include "triangle.h"
+#define TINYOBJLOADER_DISABLE_FAST_FLOAT
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "model.h"
+#include "mesh.h"
 #include "texture.h"
+
 
 #define THREAD_COUNT 8
 
@@ -410,7 +415,7 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	auto sphere_material = make_shared<lambertian>(color(0.7, 0.3, 0.1));
 	world.add(make_shared<sphere>(center1, center2, 50, sphere_material));
 
-	world.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
+	// world.add(make_shared<sphere>(point3(260, 150, 45), 50, make_shared<dielectric>(1.5)));
 	world.add(make_shared<sphere>(point3(60, 180, 200), 50, make_shared<metal>(color(0.8, 0.8, 0.9), 1.0)));
 
 	auto boundary = make_shared<sphere>(point3(360, 150, 145), 70, make_shared<dielectric>(1.5));
@@ -443,6 +448,21 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	)
 	);
 
+	auto glass = make_shared<dielectric>(1.5f);
+
+	hittable_list teapot_geom;
+	model teapot_model("models/utah_teapot.obj", glass);
+
+	shared_ptr<hittable> teapot_mesh = teapot_model.get_mesh();
+
+	teapot_mesh = scale_to_height(teapot_mesh, 200.0f);
+
+	teapot_mesh = make_shared<translate>(teapot_mesh, point3(277, 50, 277));
+
+	world.add(teapot_mesh);
+
+	world = hittable_list(make_shared<bvh_node>(world));
+
 	camera cam;
 
 	cam.aspect_ratio = 16.0f/10.0f;
@@ -463,9 +483,159 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 	cam.render(world);
 }
 
+void cornell_teapot() {
+	hittable_list world;
+
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto blue = make_shared<lambertian>(color(.12, .15, .45));
+	auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), red));
+	world.add(make_shared<quad>(point3(343, 554, 332), glm::vec3(-130, 0, 0), glm::vec3(0, 0, -105), light));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
+
+	auto glass = make_shared<dielectric>(1.5f);
+
+	model teapot_model("models/utah_teapot.obj", glass);
+
+	shared_ptr<hittable> teapot_mesh = teapot_model.get_mesh();
+
+	teapot_mesh = scale_to_height(teapot_mesh, 200.0f);
+
+	teapot_mesh = make_shared<translate>(teapot_mesh, point3(277, 50, 277));
+
+	world.add(teapot_mesh);
+
+	world = hittable_list(make_shared<bvh_node>(world));
+
+	camera cam;
+
+	cam.aspect_ratio = 1.0f;
+	cam.image_width = 1000;
+	cam.samples_per_pixel = 4096;	
+	cam.max_depth = 25;
+	cam.thread_count = THREAD_COUNT;
+	cam.background = color(0, 0, 0);
+
+	cam.vfov = 40;
+	cam.lookfrom = point3(278, 278, -800);
+	cam.lookat = point3(278, 278, 0);
+	cam.vup = glm::vec3(0, 1, 0);
+
+	cam.defocus_angle = 0;
+
+	cam.render(world);
+}
+
+void cornell_nike() {
+	hittable_list world;
+
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto blue = make_shared<lambertian>(color(.12, .15, .45));
+	auto light = make_shared<diffuse_light>(color(15, 15, 15));
+
+	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), red));
+	world.add(make_shared<quad>(point3(343, 554, 332), glm::vec3(-130, 0, 0), glm::vec3(0, 0, -105), light));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
+
+	auto glass = make_shared<dielectric>(1.5f);
+
+	model nike_model("models/Winged_Victory_Of_Samothrace.obj", glass);
+
+	shared_ptr<hittable> nike_mesh = nike_model.get_mesh();
+
+	nike_mesh = scale_to_height(nike_mesh, 450.0f);
+
+	nike_mesh = make_shared<translate>(nike_mesh, point3(277, 25, 277));
+
+	world.add(nike_mesh);
+
+	world = hittable_list(make_shared<bvh_node>(world));
+
+	camera cam;
+
+	cam.aspect_ratio = 1.0f;
+	cam.image_width = 1000;
+	cam.samples_per_pixel = 8192;
+	cam.max_depth = 25;
+	cam.thread_count = THREAD_COUNT;
+	cam.background = color(0, 0, 0);
+
+	cam.vfov = 40;
+	cam.lookfrom = point3(278, 278, -800);
+	cam.lookat = point3(278, 278, 0);
+	cam.vup = glm::vec3(0, 1, 0);
+
+	cam.defocus_angle = 0;
+
+	cam.render(world);
+}
+
+void cornell_miku() {
+	hittable_list world;
+
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto blue = make_shared<lambertian>(color(.12, .15, .45));
+	auto light = make_shared<diffuse_light>(color(7, 7, 7));
+
+	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), green));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(0, 555, 0), glm::vec3(0, 0, 555), red));
+	world.add(make_shared<quad>(point3(113, 554, 127), glm::vec3(330, 0, 0), glm::vec3(0, 0, 305), light));
+	world.add(make_shared<quad>(point3(0, 0, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(555, 555, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 0, -555), white));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 555, 0), white));
+
+	auto glass = make_shared<dielectric>(1.5f);
+	auto texture = make_shared<lambertian>(make_shared<image_texture>("models/miku/miku_texture.png"));
+
+	model miku_model("models/miku/miku.obj", texture);
+
+	shared_ptr<hittable> miku_mesh = miku_model.get_mesh();
+
+	miku_mesh = scale_to_height(miku_mesh, 450.0f);
+
+	miku_mesh = make_shared<rotate_y>(miku_mesh, 180);
+
+	miku_mesh = make_shared<translate>(miku_mesh, point3(277, -10, 277));
+
+	world.add(miku_mesh);
+
+	world = hittable_list(make_shared<bvh_node>(world));
+
+	camera cam;
+
+	cam.aspect_ratio = 1.0f;
+	cam.image_width = 1000;
+	cam.samples_per_pixel = 512;
+	cam.max_depth = 25;
+	cam.thread_count = THREAD_COUNT;
+	cam.background = color(0, 0, 0);
+
+	cam.vfov = 40;
+	cam.lookfrom = point3(278, 278, -800);
+	cam.lookat = point3(278, 278, 0);
+	cam.vup = glm::vec3(0, 1, 0);
+
+	cam.defocus_angle = 0;
+
+	cam.render(world);
+}
+
 int main()
 {
-	switch (10)
+	switch (13)
 	{
 		case 1: bouncing_spheres(); break; 
 		case 2: checkered_spheres(); break;
@@ -477,6 +647,9 @@ int main()
 		case 8: cornell_box(); break;
 		case 9: cornell_smoke(); break;
 		case 10: final_scene(2880, 10000, 50); break;
-		default: final_scene(2560, 50, 50); break;
+		case 11: cornell_teapot(); break;
+		case 12: cornell_nike(); break;
+		case 13: cornell_miku(); break;
+		default: final_scene(800, 50, 50); break;
 	}
 }

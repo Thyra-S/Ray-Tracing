@@ -146,10 +146,14 @@
     <ClInclude Include="color.h" />
     <ClInclude Include="constant_medium.h" />
     <ClInclude Include="external\stb_image.h" />
+    <ClInclude Include="external\tiny_obj_loader.h" />
     <ClInclude Include="hittable.h" />
     <ClInclude Include="hittable_list.h" />
     <ClInclude Include="interval.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="mesh.h" />
+    <ClInclude Include="mesh_triangle.h" />
+    <ClInclude Include="model.h" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="quad.h" />
     <ClInclude Include="ray.h" />

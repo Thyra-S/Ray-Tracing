@@ -55,11 +55,15 @@ inline int random_int(int min, int max) {
 
 #define GLM_FORCE_INTRINSICS // Tells GLM to use SIMD instructions
 #define GLM_FORCE_AVX2       // Tells GLM to use AVX2 specifically
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/random.hpp>
 
+
+
 using color = glm::vec3;
-using POINT = glm::vec3;
+using point = glm::vec3;
 
 inline glm::vec3 random_unit_vector() 
 {

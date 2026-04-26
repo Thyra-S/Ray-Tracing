@@ -37,7 +37,7 @@ public:
 	translate(shared_ptr<hittable> object, const glm::vec3& offset)
 		: object(object), offset(offset) 
 	{
-		bbox = object->bounding_box();
+		bbox = object->bounding_box() + offset;
 	}
 
 	bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
@@ -146,6 +146,7 @@ public:
 		return true;
 	}
 
+
 	aabb bounding_box() const override { return bbox; }
 
 private:
@@ -154,4 +155,60 @@ private:
 	float cos_theta;
 	aabb bbox;
 };
+
+class scale : public hittable {
+public:
+	// Takes an object and a uniform scale factor (e.g., 2.0 to double in size, 0.5 to halve)
+	scale(shared_ptr<hittable> object, float scale_factor)
+		: object(object), scale_factor(scale_factor)
+	{	
+		aabb bbox_inner = object->bounding_box();
+
+		point3 min_p(bbox_inner.x.min, bbox_inner.y.min, bbox_inner.z.min);
+		point3 max_p(bbox_inner.x.max, bbox_inner.y.max, bbox_inner.z.max);
+
+		bbox = aabb(min_p * scale_factor, max_p * scale_factor);
+	}
+
+	bool hit(const ray& r, interval ray_t, hit_record& rec) const override {
+		// transform to object space by scaling the ray's origin and direction by the inverse of the scale factor
+		ray scaled_r(r.origin() / scale_factor, r.direction() / scale_factor, r.time());
+
+		// Determine whether an intersection exists in scaled object space
+		if (!object->hit(scaled_r, ray_t, rec))
+			return false;
+
+		// Transform the intersection point back to world space
+		rec.p *= scale_factor;
+
+		// Note: For uniform scaling, the normal's direction does not change, 
+		// so we don't need to do any math on rec.normal.
+
+		return true;
+	}
+
+	aabb bounding_box() const override { return bbox; }
+
+private:
+	shared_ptr<hittable> object;
+	float scale_factor;
+	aabb bbox;
+};
+
+inline shared_ptr<hittable> scale_to_height(shared_ptr<hittable> object, float target_height)
+{
+	aabb bbox = object->bounding_box();
+	float current_height = bbox.y.size();
+
+	// Safety check to prevent dividing by zero if the object is perfectly flat
+	if (current_height < 0.00001f) {
+		return object;
+	}
+
+	// The math: if it's 2 units tall and you want 10, 10 / 2 = scale factor of 5
+	float scale_factor = target_height / current_height;
+
+	return make_shared<scale>(object, scale_factor);
+}
+
 #endif // !HITTABLE_H
