@@ -613,7 +613,7 @@ void cornell_miku() {
 	world.add(miku_mesh);
 
 	world = hittable_list(make_shared<bvh_node>(world));
-
+	  
 	camera cam;
 
 	cam.aspect_ratio = 1.0f;
