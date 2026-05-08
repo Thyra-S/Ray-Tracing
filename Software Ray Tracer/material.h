@@ -2,6 +2,7 @@
 #define MATERIAL_H
 
 #include "hittable.h"
+#include "onb.h"
 #include "texture.h"
 
 class material 
@@ -10,10 +11,23 @@ public:
 	virtual ~material() = default;
 
 	virtual bool scatter(
-		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered
-	) const { return false; }
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, float& pdf
+	) const 
+	{
+		return false;
+	}
 
-	virtual color emitted(float u, float v, const point3& p) const { return color(0, 0, 0); }
+	virtual color emitted(
+		const ray& r_in, const hit_record& rec, double u, double v, const point3& p
+	) const 
+	{
+		return color(0, 0, 0);
+	}
+
+	virtual float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered) const
+	{
+		return 0;
+	}
 };
 
 class lambertian : public material 
@@ -22,17 +36,24 @@ public:
 	lambertian(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
 	lambertian(shared_ptr<texture> tex) : tex(tex) {}
 
-	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
+	bool scatter( 
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, float& pdf
+	) const override 
+	{
+		onb uvw(rec.normal);
+		auto scatter_direction = uvw.transform(random_cosine_direction());
+
+		scattered = ray(rec.p, normalize(scatter_direction), r_in.time());
+		attenuation = tex->value(rec.u, rec.v, rec.p);
+		pdf = dot(uvw.w(), scattered.direction()) / pi;
+		return true;
+	}
+
+	float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)
 		const override 
 	{
-		auto scatter_direction = rec.normal + random_unit_vector();
-
-		if (near_zero(scatter_direction))
-			scatter_direction = rec.normal;
-
-		scattered = ray(rec.p, scatter_direction, r_in.time());
-		attenuation = tex->value(rec.u,rec.v,rec.p);
-		return true;
+		auto cos_theta = dot(rec.normal, normalize(scattered.direction()));
+		return cos_theta < 0 ? 0 : cos_theta / pi;
 	}
 
 private:
@@ -43,9 +64,10 @@ class metal : public material {
   public:
 	  metal(const color& albedo, float fuzz) : albedo(albedo), fuzz(fuzz < 1 ? fuzz : 1) {}
 
-    bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-    const override
-	{
+	  bool scatter(
+		  const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, float& pdf
+	  ) const override
+	  {
         glm::vec3 reflected = reflect(r_in.direction(), rec.normal);
 		reflected = glm::normalize(reflected) + (fuzz * random_unit_vector());
         scattered = ray(rec.p, reflected, r_in.time());
@@ -63,8 +85,9 @@ class dielectric : public material
   public:
 	dielectric(float refraction_index) : refraction_index(refraction_index) {}
 
-	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-	const override 
+	bool scatter( 
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, float& pdf
+	) const override 
 	{
 		attenuation = color(1.0f, 1.0f, 1.0f);
 		float ri = rec.front_face ? (1.0f /refraction_index) : refraction_index;
@@ -101,7 +124,10 @@ public:
 	diffuse_light(shared_ptr<texture> tex) : tex(tex) {}
 	diffuse_light(const color& emit) : tex(make_shared<solid_color>(emit)) {}
 
-	color emitted(float u, float v, const point3& p) const override {
+	color emitted(const ray& r_in, const hit_record& rec, double u, double v, const point3& p)
+		const override {
+		if (!rec.front_face)
+			return color(0, 0, 0);
 		return tex->value(u, v, p);
 	}
 
@@ -114,11 +140,19 @@ public:
 	isotropic(const color& albedo) : tex(make_shared<solid_color>(albedo)) {}
 	isotropic(shared_ptr<texture> tex) : tex(tex) {}
 
-	bool scatter(const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered)
-		const override {
+	bool scatter(
+		const ray& r_in, const hit_record& rec, color& attenuation, ray& scattered, float& pdf
+	) const override
+	{
 		scattered = ray(rec.p, random_unit_vector(), r_in.time());
 		attenuation = tex->value(rec.u, rec.v, rec.p);
+		pdf = 1 / (4 * pi);
 		return true;
+	}
+
+	float scattering_pdf(const ray& r_in, const hit_record& rec, const ray& scattered)
+		const override {
+		return 1 / (4 * pi);
 	}
 
 private:

@@ -84,6 +84,18 @@ inline glm::vec3 random_on_hemisphere(const glm::vec3& normal)
 		return -on_unit_sphere;
 }
 
+inline glm::vec3 random_cosine_direction() {
+	auto r1 = random_float();
+	auto r2 = random_float();
+
+	auto phi = 2 * pi * r1;
+	auto x = std::cos(phi) * std::sqrt(r2);
+	auto y = std::sin(phi) * std::sqrt(r2);
+	auto z = std::sqrt(1 - r2);
+
+	return { x, y, z };
+}
+
 bool near_zero(glm::vec3 vec) 
 {
 	// Return true if the vector is close to zero in all dimensions.

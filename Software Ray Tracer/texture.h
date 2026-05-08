@@ -4,14 +4,16 @@
 #include "perlin.h"
 #include "rt_stb_image.h"
 
-class texture {
+class texture 
+{
 public:
 	virtual ~texture() = default;
 
 	virtual color value(float u, float v, const point3& p) const = 0;
 };
 
-class solid_color : public texture {
+class solid_color : public texture 
+{
 public:
 	solid_color(const color& albedo) : albedo(albedo) {}
 

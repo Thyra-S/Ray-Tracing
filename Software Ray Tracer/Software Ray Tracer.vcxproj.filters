@@ -16,16 +16,20 @@
     <Filter Include="Header Files\Primatives">
       <UniqueIdentifier>{f95f85cf-b05c-4e07-a15c-5bab08be501a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BVH">
+      <UniqueIdentifier>{a5cb35eb-320c-4182-aa25-fccabdb05841}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Models">
+      <UniqueIdentifier>{25573f1a-c177-497d-9123-adf7fd8c012e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="image.ppm">
-      <Filter>Resource Files</Filter>
-    </None>
+    <None Include="Renders\image.ppm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="color.h">
@@ -52,16 +56,7 @@
     <ClInclude Include="material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="aabb.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bvh.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="texture.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="rt_stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="external\stb_image.h">
@@ -81,6 +76,30 @@
     </ClInclude>
     <ClInclude Include="triangle.h">
       <Filter>Header Files\Primatives</Filter>
+    </ClInclude>
+    <ClInclude Include="aabb.h">
+      <Filter>Header Files\BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="bvh.h">
+      <Filter>Header Files\BVH</Filter>
+    </ClInclude>
+    <ClInclude Include="external\tiny_obj_loader.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="rt_stb_image.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh_triangle.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="mesh.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="model.h">
+      <Filter>Header Files\Models</Filter>
+    </ClInclude>
+    <ClInclude Include="onb.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

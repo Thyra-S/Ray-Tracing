@@ -17,10 +17,27 @@
 
 #define THREAD_COUNT 8
 
+struct camera_parameters
+{
+	float aspect_ratio;
+	int image_width;
+	int samples_per_pixel;
+	int max_depth;
+	int thread_count;
+	color background;
+	float vfov;
+	point3 lookfrom;
+	point3 lookat;
+	glm::vec3 vup;
+	float defocus_angle;
+	float focus_dist;
+};
+
+hittable_list world;
+camera_parameters params;
+
 void bouncing_spheres()
 {
-	hittable_list world;
-
 	auto checker = make_shared<checker_texture>(0.32f, color(0.2f, 0.3f, 0.1f), color(0.9f, 0.9f, 0.9f));
 	world.add(make_shared<sphere>(point3(0.0f, -1000.0f, 0.0f), 1000.0f, make_shared<lambertian>(checker)));
 
@@ -67,107 +84,94 @@ void bouncing_spheres()
 
 	world = hittable_list(make_shared<bvh_node>(world));
 
-	camera cam;
-
-	cam.aspect_ratio	  = 16.0f / 9.0f;
-	cam.image_width		  = 960;
-	cam.samples_per_pixel = 64;
-	cam.max_depth		  = 50;
-	cam.thread_count	  = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov	 = 20.0f;
-	cam.lookfrom = point3(13.0f, 2.0f, 3.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	cam.defocus_angle = 0.6f;
-	cam.focus_dist	  = 10.0f;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 16.0f / 9.0f,
+		.image_width = 960,
+		.samples_per_pixel = 64,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 20.0f,
+		.lookfrom = point3(13.0f, 2.0f, 3.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.6f,
+		.focus_dist = 10.0f
+	};
 }
 
-void checkered_spheres() {
-	hittable_list world;
-
+void checkered_spheres() 
+{
 	auto checker = make_shared<checker_texture>(0.03f, color(0.2f, 0.3f, 0.1f), color(0.9f, 0.9f, 0.9f));
 
 	world.add(make_shared<sphere>(point3(0, -10, 0), 10, make_shared<lambertian>(checker)));
 	world.add(make_shared<sphere>(point3(0, 10, 0), 10, make_shared<lambertian>(checker)));
 
-	camera cam;
-
-	cam.aspect_ratio = 16.0f / 9.0f;
-	cam.image_width = 640;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov = 20.0f;
-	cam.lookfrom = point3(13.0f, 2.0f, 3.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	cam.defocus_angle = 0.0f;
-	cam.focus_dist = 10.0f;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 16.0f / 9.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 20.0f,
+		.lookfrom = point3(13.0f, 2.0f, 3.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void earth() {
+void earth()
+{
 	auto earth_texture = make_shared<image_texture>("images/earthmap.jpg");
 	auto earth_surface = make_shared<lambertian>(earth_texture);
 	auto globe = make_shared<sphere>(point3(0.0f, 0.0f, 0.0f), 2.0f, earth_surface);
-
 	camera cam;
 
-	cam.aspect_ratio = 16.0f / 9.0f;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov = 20.0f;
-	cam.lookfrom = point3(0.0f, 0.0f, 12.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	cam.defocus_angle = 0.0f;
-
-	cam.render(hittable_list(globe));
+	params =
+	{
+		.aspect_ratio = 16.0f / 9.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 20.0f,
+		.lookfrom = point3(0.0f, 0.0f, 12.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void perlin_spheres() {
+void perlin_spheres() 
+{
 	hittable_list world;
 
 	auto pertext = make_shared<noise_texture>(4.0f);
 	world.add(make_shared<sphere>(point3(0.0f, -1000.0f, 0.0f), 1000.0f, make_shared<lambertian>(pertext)));
 	world.add(make_shared<sphere>(point3(0.0f, 2.0f, 0.0f), 2.0f, make_shared<lambertian>(pertext)));
 
-	camera cam;
-
-	cam.aspect_ratio = 16.0f / 9.0f;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov = 20.0f;
-	cam.lookfrom = point3(13.0f, 2.0f, 3.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0f);
-
-	cam.defocus_angle = 0.0f;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 16.0f / 9.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 20.0f,
+		.lookfrom = point3(13.0f, 2.0f, 3.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void quads() {
-	hittable_list world;
-
+void quads() 
+{
 	// Materials
 	auto left_red = make_shared<lambertian>(color(1.0f, 0.2f, 0.2f));
 	auto back_green = make_shared<lambertian>(color(0.2f, 1.0f, 0.2f));
@@ -182,28 +186,24 @@ void quads() {
 	world.add(make_shared<quad>(point3(-2.0f, 3.0f, 1.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 4.0f), upper_orange));
 	world.add(make_shared<quad>(point3(-2.0f, -3.0f, 5.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -4.0f), lower_teal));
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov = 80.0f;
-	cam.lookfrom = point3(0.0f, 0.0f, 9.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0);
-
-	cam.defocus_angle = 0.0f;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 80.0f,
+		.lookfrom = point3(0.0f, 0.0f, 9.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void tris() {
-	hittable_list world;
-
+void tris() 
+{
 	// Materials
 	auto left_red = make_shared<lambertian>(color(1.0f, 0.2f, 0.2f));
 	auto back_green = make_shared<lambertian>(color(0.2f, 1.0f, 0.2f));
@@ -227,23 +227,20 @@ void tris() {
 	world.add(make_shared<triangle>(point3(-2.0f, -3.0f, 5.0f), glm::vec3(4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, -4.0f), lower_teal));
 	world.add(make_shared<triangle>(point3(2.0f, -3.0f, 1.0f), glm::vec3(-4.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 4.0f), back_green));
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0.70, 0.80, 1.00);
-
-	cam.vfov = 80.0f;
-	cam.lookfrom = point3(0.0f, 0.0f, 9.0f);
-	cam.lookat = point3(0.0f, 0.0f, 0.0f);
-	cam.vup = glm::vec3(0.0f, 1.0f, 0.0);
-
-	cam.defocus_angle = 0.0f;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0.70f, 0.80f, 1.00f),
+		.vfov = 80.0f,
+		.lookfrom = point3(0.0f, 0.0f, 9.0f),
+		.lookat = point3(0.0f, 0.0f, 0.0f),
+		.vup = glm::vec3(0.0f, 1.0f, 0.0f),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
 void simple_light() {
@@ -255,29 +252,24 @@ void simple_light() {
 
 	auto difflight = make_shared<diffuse_light>(color(4, 4, 4));
 	world.add(make_shared<quad>(point3(3, 1, -2), glm::vec3(2, 0, 0), glm::vec3(0, 2, 0), difflight));
-
-	camera cam;
-
-	cam.aspect_ratio = 16.0f / 9.0f;
-	cam.image_width = 400;
-	cam.samples_per_pixel = 100;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0, 0, 0);
-
-	cam.vfov = 20;
-	cam.lookfrom = point3(26, 3, 6);
-	cam.lookat = point3(0, 2, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 16.0f / 9.0f,
+		.image_width = 400,
+		.samples_per_pixel = 100,
+		.max_depth = 50,
+		.background = color(0, 0, 0),
+		.vfov = 20,
+		.lookfrom = point3(26, 3, 6),
+		.lookat = point3(0, 2, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0,
+		.focus_dist = 10
+	};
 }
 
-void cornell_box() {
-	hittable_list world;
-
+void cornell_box()
+{
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
@@ -306,13 +298,13 @@ void cornell_box() {
 	point3 D(centroid_x, height, centroid_z);
 
 	// Create the tetrahedron
-	auto glass  = make_shared<dielectric>(1.5f);
+	auto glass = make_shared<dielectric>(1.5f);
 	shared_ptr<hittable> tet1 = tetrahedron(A, B, C, D, glass);
 
 	//shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
 	tet1 = make_shared<rotate_y>(tet1, 75);
 	tet1 = make_shared<translate>(tet1, glm::vec3(300, 20, 300));
-	
+
 	world.add(tet1);
 
 	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
@@ -320,28 +312,24 @@ void cornell_box() {
 	box2 = make_shared<translate>(box2, glm::vec3(130, 0, 65));
 	world.add(box2);
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 600;
-	cam.samples_per_pixel = 1000;
-	cam.max_depth = 50;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0, 0, 0);
-
-	cam.vfov = 40;
-	cam.lookfrom = point3(278, 278, -800);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 600,
+		.samples_per_pixel = 1000,
+		.max_depth = 50,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void cornell_smoke() {
-	hittable_list world;
 
+void cornell_smoke() {
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
@@ -365,26 +353,23 @@ void cornell_smoke() {
 	world.add(make_shared<constant_medium>(box1, 0.01f, color(0, 0, 0)));
 	world.add(make_shared<constant_medium>(box2, 0.01f, color(1, 1, 1)));
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0;
-	cam.image_width = 600;
-	cam.samples_per_pixel = 200;
-	cam.max_depth = 50;
-	cam.background = color(0, 0, 0);
-	cam.thread_count = THREAD_COUNT;
-
-	cam.vfov = 40.0f;
-	cam.lookfrom = point3(278, 278, -800);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 600,
+		.samples_per_pixel = 200,
+		.max_depth = 50,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
-void final_scene(int image_width, int samples_per_pixel, int max_depth) {
+void final_scene() {
 	hittable_list boxes1;
 	auto ground = make_shared<lambertian>(color(0.48, 0.83, 0.53));
 
@@ -402,8 +387,6 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 			boxes1.add(box(point3(x0, y0, z0), point3(x1, y1, z1), ground));
 		}
 	}
-
-	hittable_list world;
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	world.add(make_shared<bvh_node>(boxes1));
 
@@ -463,29 +446,23 @@ void final_scene(int image_width, int samples_per_pixel, int max_depth) {
 
 	world = hittable_list(make_shared<bvh_node>(world));
 
-	camera cam;
-
-	cam.aspect_ratio = 16.0f/10.0f;
-	cam.image_width = image_width;
-	cam.samples_per_pixel = samples_per_pixel;
-	cam.max_depth = max_depth;
-	cam.background = color(0, 0, 0);
-	cam.thread_count = THREAD_COUNT;
-	cam.image_file = std::ofstream("Renders/image.ppm");
-
-	cam.vfov = 40.0f;
-	cam.lookfrom = point3(478, 278, -600);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 16.0f/10.0f,
+		.image_width = 1000,
+		.samples_per_pixel = 4096,
+		.max_depth = 25,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(478, 278, -600),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
 void cornell_teapot() {
-	hittable_list world;
-
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
@@ -513,28 +490,23 @@ void cornell_teapot() {
 
 	world = hittable_list(make_shared<bvh_node>(world));
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 1000;
-	cam.samples_per_pixel = 4096;	
-	cam.max_depth = 25;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0, 0, 0);
-
-	cam.vfov = 40;
-	cam.lookfrom = point3(278, 278, -800);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 1000,
+		.samples_per_pixel = 4096,
+		.max_depth = 25,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
 void cornell_nike() {
-	hittable_list world;
-
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
@@ -562,28 +534,23 @@ void cornell_nike() {
 
 	world = hittable_list(make_shared<bvh_node>(world));
 
-	camera cam;
-
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 1000;
-	cam.samples_per_pixel = 8192;
-	cam.max_depth = 25;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0, 0, 0);
-
-	cam.vfov = 40;
-	cam.lookfrom = point3(278, 278, -800);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
-
-	cam.defocus_angle = 0;
-
-	cam.render(world);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 1000,
+		.samples_per_pixel = 4096,
+		.max_depth = 25,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
 }
 
 void cornell_miku() {
-	hittable_list world;
-
 	auto red = make_shared<lambertian>(color(.65, .05, .05));
 	auto white = make_shared<lambertian>(color(.73, .73, .73));
 	auto green = make_shared<lambertian>(color(.12, .45, .15));
@@ -613,43 +580,116 @@ void cornell_miku() {
 	world.add(miku_mesh);
 
 	world = hittable_list(make_shared<bvh_node>(world));
-	  
-	camera cam;
 
-	cam.aspect_ratio = 1.0f;
-	cam.image_width = 1000;
-	cam.samples_per_pixel = 512;
-	cam.max_depth = 25;
-	cam.thread_count = THREAD_COUNT;
-	cam.background = color(0, 0, 0);
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 1000,
+		.samples_per_pixel = 4096,
+		.max_depth = 25,
+		.background = color(0, 0, 0),
+		.vfov = 40.0f,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0.0f,
+		.focus_dist = 10.0f
+	};
+}
 
-	cam.vfov = 40;
-	cam.lookfrom = point3(278, 278, -800);
-	cam.lookat = point3(278, 278, 0);
-	cam.vup = glm::vec3(0, 1, 0);
+void cornell()
+{
 
-	cam.defocus_angle = 0;
+	auto red = make_shared<lambertian>(color(.65, .05, .05));
+	auto white = make_shared<lambertian>(color(.73, .73, .73));
+	auto green = make_shared<lambertian>(color(.12, .45, .15));
+	auto light = make_shared<diffuse_light>(color(15, 15, 15));
 
-	cam.render(world);
+	// Cornell box sides
+	world.add(make_shared<quad>(point3(555, 0, 0), glm::vec3(0, 0, 555), glm::vec3(0, 555, 0), green));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(0, 0, -555), glm::vec3(0, 555, 0), red));
+	world.add(make_shared<quad>(point3(0, 555, 0), glm::vec3(555, 0, 0), glm::vec3(0, 0, 555), white));
+	world.add(make_shared<quad>(point3(0, 0, 555), glm::vec3(555, 0, 0), glm::vec3(0, 0, -555), white));
+	world.add(make_shared<quad>(point3(555, 0, 555), glm::vec3(-555, 0, 0), glm::vec3(0, 555, 0), white));
+
+	// Light
+	world.add(make_shared<quad>(point3(213, 554, 227), glm::vec3(130, 0, 0), glm::vec3(0, 0, 105), light));
+
+	// Box 1
+	shared_ptr<hittable> box1 = box(point3(0, 0, 0), point3(165, 330, 165), white);
+	box1 = make_shared<rotate_y>(box1, 15);
+	box1 = make_shared<translate>(box1, glm::vec3(265, 0, 295));
+	world.add(box1);
+
+	// Box 2
+	shared_ptr<hittable> box2 = box(point3(0, 0, 0), point3(165, 165, 165), white);
+	box2 = make_shared<rotate_y>(box2, -18);
+	box2 = make_shared<translate>(box2, glm::vec3(130, 0, 65));
+	world.add(box2);
+
+	params =
+	{
+		.aspect_ratio = 1.0f,
+		.image_width = 600,
+		.samples_per_pixel = 64,
+		.max_depth = 50,
+		.background = color(0, 0, 0),
+		.vfov = 40,
+		.lookfrom = point3(278, 278, -800),
+		.lookat = point3(278, 278, 0),
+		.vup = glm::vec3(0, 1, 0),
+		.defocus_angle = 0,
+		.focus_dist = 800.0f
+	};
+}
+
+void set_camera_parameters(camera& cam, camera_parameters params) 
+{
+	cam.aspect_ratio = params.aspect_ratio;
+	cam.image_width = params.image_width;
+	cam.samples_per_pixel = params.samples_per_pixel;
+	cam.max_depth = params.max_depth;
+	cam.thread_count = params.thread_count;
+	cam.background = params.background;
+	cam.vfov = params.vfov;
+	cam.lookfrom = params.lookfrom;
+	cam.lookat = params.lookat;
+	cam.vup = params.vup;
+	cam.defocus_angle = params.defocus_angle;
+	cam.focus_dist = params.focus_dist;
 }
 
 int main()
 {
-	switch (13)
+	switch (14)
 	{
-		case 1: bouncing_spheres(); break; 
-		case 2: checkered_spheres(); break;
-		case 3: earth(); break;
-		case 4: perlin_spheres(); break;
-		case 5: quads(); break;
-		case 6: tris(); break;
-		case 7: simple_light(); break;
-		case 8: cornell_box(); break;
-		case 9: cornell_smoke(); break;
-		case 10: final_scene(2880, 10000, 50); break;
-		case 11: cornell_teapot(); break;
-		case 12: cornell_nike(); break;
-		case 13: cornell_miku(); break;
-		default: final_scene(800, 50, 50); break;
+	case 1: bouncing_spheres(); break;
+	case 2: checkered_spheres(); break;
+	case 3: earth(); break;
+	case 4: perlin_spheres(); break;
+	case 5: quads(); break;
+	case 6: tris(); break;
+	case 7: simple_light(); break;
+	case 8: cornell_box(); break;
+	case 9: cornell_smoke(); break;
+	case 10: final_scene(); break;
+	case 11: cornell_teapot(); break;
+	case 12: cornell_nike(); break;
+	case 13: cornell_miku(); break;
+	case 14: cornell(); break;
 	}
+
+	world = hittable_list(make_shared<bvh_node>(world));
+
+	camera cam;
+
+	// performance impacting params, comment to use defaults for scenes
+	// params.image_width = 1000;
+	params.samples_per_pixel = 1000;
+	// params.max_depth = 25;
+	params.thread_count = 8;
+
+	set_camera_parameters(cam, params);
+
+	cam.render(world);
 }

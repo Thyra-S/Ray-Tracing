@@ -137,7 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="aabb.h" />
@@ -154,6 +154,7 @@
     <ClInclude Include="mesh.h" />
     <ClInclude Include="mesh_triangle.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="onb.h" />
     <ClInclude Include="perlin.h" />
     <ClInclude Include="quad.h" />
     <ClInclude Include="ray.h" />
