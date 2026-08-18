@@ -17,7 +17,7 @@ A from-scratch, C++ physically-based ray tracer built to simulate realistic ligh
 *   **.obj File Loading:** Imports .obj files using simple OBJ loader
 *   **Multithreading:** Dynamically allocates different ray calculations to different threads
 *   **BVH:** Simple Binary BVH creation splitting along the longest-axis as well as accurate traversal.
-*   
+
 ## 🖼️ Gallery
 ![Glass Teapot](https://github.com/Thyra-S/Ray-Tracing/blob/master/Software%20Ray%20Tracer/Renders/teapotcornell.png?raw=true)
 ![Nike of Samothrace Glass](https://github.com/Thyra-S/Ray-Tracing/blob/master/Software%20Ray%20Tracer/Renders/nikecornell.png?raw=true)
